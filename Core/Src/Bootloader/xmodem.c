@@ -91,6 +91,7 @@ void xmodem_receive(void)
         (void)uart_transmit_str((uint8_t*)"\n\rFirmware updated!\n\r");
         (void)uart_transmit_str((uint8_t*)"Jumping to user application...\n\r");
 #endif
+        clear_sw_request();
         flash_jump_to_app();
         break;
       /* Abort from host. */

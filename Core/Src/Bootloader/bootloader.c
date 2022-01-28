@@ -18,19 +18,30 @@ FLASH_EraseInitTypeDef erase_init =
 	.NbPages = 1
 };
 
-uint32_t check_for_sw_reset(void)
+void clear_sw_request(void)
 {
-uint32_t datalo, datahi;
-uint32_t error = 0u,ret_val = HAL_ERROR;
+uint32_t datalo, datahi,error;
 
     datahi = (*(volatile uint32_t*)FLASH_LASTPAGE_ADDRESS);
     datalo = (*(volatile uint32_t*)(FLASH_LASTPAGE_ADDRESS+4));
     if (( datahi == 0xdeadbeef ) && ( datalo == 0xbeefdead ))
     {
         HAL_FLASH_Unlock();
-        ret_val = HAL_FLASHEx_Erase(&erase_init, &error);
+        HAL_FLASHEx_Erase(&erase_init, &error);
         HAL_FLASH_Lock();
     }
+}
+
+
+uint32_t check_for_sw_reset(void)
+{
+uint32_t datalo, datahi;
+uint32_t ret_val = 1;
+
+    datahi = (*(volatile uint32_t*)FLASH_LASTPAGE_ADDRESS);
+    datalo = (*(volatile uint32_t*)(FLASH_LASTPAGE_ADDRESS+4));
+    if (( datahi == 0xdeadbeef ) && ( datalo == 0xbeefdead ))
+    	ret_val = 0;
     return ret_val;
 }
 
@@ -56,6 +67,8 @@ void bootloader(void)
 		xmodem_receive();
 		/* We only exit the xmodem protocol, if there are any errors.
 		* In that case, notify the user and start over. */
+#ifdef VERBOSE
 		uart_transmit_str((uint8_t*)"\n\rFailed... Please try again.\n\r");
+#endif
 	}
 }
