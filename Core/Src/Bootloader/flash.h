@@ -10,7 +10,6 @@
 #ifndef FLASH_H_
 #define FLASH_H_
 
-#include "main.h"
 
 /* Start and end addresses of the user application. */
 #define	FLASH_START_ADDRESS		((uint32_t)0x08000000u)

@@ -7,6 +7,7 @@
  *          Copyright (c) 2018 Ferenc Nemeth - https://github.com/ferenc-nemeth
  */
 
+#include "main.h"
 #include "xmodem.h"
 
 /* Global variables. */

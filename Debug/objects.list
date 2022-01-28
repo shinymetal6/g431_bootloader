@@ -1,3 +1,4 @@
+"./Core/Src/Bootloader/bootloader.o"
 "./Core/Src/Bootloader/flash.o"
 "./Core/Src/Bootloader/uart.o"
 "./Core/Src/Bootloader/xmodem.o"

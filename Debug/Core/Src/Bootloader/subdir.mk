@@ -5,16 +5,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Core/Src/Bootloader/bootloader.c \
 ../Core/Src/Bootloader/flash.c \
 ../Core/Src/Bootloader/uart.c \
 ../Core/Src/Bootloader/xmodem.c 
 
 OBJS += \
+./Core/Src/Bootloader/bootloader.o \
 ./Core/Src/Bootloader/flash.o \
 ./Core/Src/Bootloader/uart.o \
 ./Core/Src/Bootloader/xmodem.o 
 
 C_DEPS += \
+./Core/Src/Bootloader/bootloader.d \
 ./Core/Src/Bootloader/flash.d \
 ./Core/Src/Bootloader/uart.d \
 ./Core/Src/Bootloader/xmodem.d 
@@ -27,7 +30,7 @@ Core/Src/Bootloader/%.o: ../Core/Src/Bootloader/%.c Core/Src/Bootloader/subdir.m
 clean: clean-Core-2f-Src-2f-Bootloader
 
 clean-Core-2f-Src-2f-Bootloader:
-	-$(RM) ./Core/Src/Bootloader/flash.d ./Core/Src/Bootloader/flash.o ./Core/Src/Bootloader/uart.d ./Core/Src/Bootloader/uart.o ./Core/Src/Bootloader/xmodem.d ./Core/Src/Bootloader/xmodem.o
+	-$(RM) ./Core/Src/Bootloader/bootloader.d ./Core/Src/Bootloader/bootloader.o ./Core/Src/Bootloader/flash.d ./Core/Src/Bootloader/flash.o ./Core/Src/Bootloader/uart.d ./Core/Src/Bootloader/uart.o ./Core/Src/Bootloader/xmodem.d ./Core/Src/Bootloader/xmodem.o
 
 .PHONY: clean-Core-2f-Src-2f-Bootloader
 

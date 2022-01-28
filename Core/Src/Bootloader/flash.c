@@ -7,6 +7,7 @@
  *          Copyright (c) 2018 Ferenc Nemeth - https://github.com/ferenc-nemeth
  */
 
+#include "main.h"
 #include "flash.h"
 
 /* Function pointer for jumping to user application. */

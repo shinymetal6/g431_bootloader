@@ -1,3 +1,3 @@
-uart.c:18:13:uart_receive	8	static
-uart.c:35:13:uart_transmit_str	8	static
-uart.c:59:13:uart_transmit_ch	16	static
+uart.c:19:13:uart_receive	8	static
+uart.c:36:13:uart_transmit_str	8	static
+uart.c:60:13:uart_transmit_ch	16	static
