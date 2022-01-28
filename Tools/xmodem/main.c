@@ -111,10 +111,9 @@ static int xymodem_send(int serial_fd, const char *filename, int protocol, int w
                         }
                 } while (answer != 'C');
 
-                printf("done.\n");
         }
 
-        printf("Sending %s ", filename);
+        printf("done.\nSending %s \n", filename);
 
         if (protocol == PROTOCOL_YMODEM) {
                 strncpy((char *) chunk.payload, filename, sizeof(chunk.payload));
@@ -182,7 +181,7 @@ static int xymodem_send(int serial_fd, const char *filename, int protocol, int w
                         return -errno;
         }
 
-        printf("done.\n");
+        printf("\nDone.\n");
 
         return 0;
 }
@@ -213,7 +212,7 @@ static int open_serial(const char *path, int baud)
                                                         // no canonical processing
         tty.c_oflag = 0;                                // no remapping, no delays
         tty.c_cc[VMIN]  = 1;                            // read doesn't block
-        tty.c_cc[VTIME] = 5;                            // 0.5 seconds read timeout
+        tty.c_cc[VTIME] = 50;                            // 0.5 seconds read timeout
 
         tty.c_iflag &= ~(IXON | IXOFF | IXANY);         // shut off xon/xoff ctrl
 
