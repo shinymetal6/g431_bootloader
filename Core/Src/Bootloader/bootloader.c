@@ -40,14 +40,18 @@ void bootloader(void)
 		if (   HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == 0 )
 			flash_jump_to_app();
 	}
+#ifdef VERBOSE
 	uart_transmit_str((uint8_t*)"\n\r================================\n\r");
 	uart_transmit_str((uint8_t*)"UART Bootloader\n\r");
 	uart_transmit_str((uint8_t*)"================================\n\r\n\r");
+#endif
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 
 	while (1)
 	{
+#ifdef VERBOSE
 		uart_transmit_str((uint8_t*)"Please send a new binary file with Xmodem protocol to update the firmware.\n\r");
+#endif
 		xmodem_receive();
 		/* We only exit the xmodem protocol, if there are any errors.
 		* In that case, notify the user and start over. */
