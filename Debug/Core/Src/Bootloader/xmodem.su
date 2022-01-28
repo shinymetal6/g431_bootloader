@@ -1,4 +1,4 @@
-xmodem.c:117:17:xmodem_calc_crc	0	static
-xmodem.c:243:22:xmodem_error_handler	8	static
-xmodem.c:144:22:xmodem_handle_packet	1056	static
 xmodem.c:29:6:xmodem_receive	16	static
+xmodem.c:117:17:xmodem_calc_crc	24	static
+xmodem.c:144:22:xmodem_handle_packet	1056	static
+xmodem.c:243:22:xmodem_error_handler	24	static

@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1643385051 source:/Devel/Stm32Sw_1.8.1/g431_bootloader/Tools/xmodem/main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<string.h>
+	<errno.h>
+	<unistd.h>
+	<fcntl.h>
+	<termios.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<sys/mman.h>
+
