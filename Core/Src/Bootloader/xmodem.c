@@ -9,6 +9,7 @@
 
 #include "main.h"
 #include "xmodem.h"
+#include "bootloader.h"
 
 /* Global variables. */
 static uint8_t xmodem_packet_number = 1u;         /**< Packet number counter. */
