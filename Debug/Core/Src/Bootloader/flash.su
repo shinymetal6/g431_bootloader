@@ -1,0 +1,3 @@
+flash.c:20:14:flash_erase	32	static
+flash.c:53:14:flash_write	32	static
+flash.c:103:6:flash_jump_to_app	8	static,ignoring_inline_asm
