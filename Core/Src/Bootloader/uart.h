@@ -17,7 +17,7 @@ extern UART_HandleTypeDef hlpuart1;
 #define	BOOT_UART	hlpuart1
 
 /* Timeout for HAL. */
-#define UART_TIMEOUT ((uint16_t)10000u)
+#define UART_TIMEOUT ((uint16_t)2000u)
 
 /* Status report for the functions. */
 typedef enum {
