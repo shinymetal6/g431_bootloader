@@ -10,11 +10,17 @@
 #include "flash.h"
 #include "uart.h"
 #include "xmodem.h"
+FLASH_EraseInitTypeDef erase_init =
+{
+	.TypeErase = FLASH_TYPEERASE_PAGES,
+	.Page = FLASH_PAGES_NUMBER-1,
+	.Banks = FLASH_TYPEERASE_PAGES,
+	.NbPages = 1
+};
 
 uint32_t check_for_sw_reset(void)
 {
 uint32_t datalo, datahi;
-FLASH_EraseInitTypeDef erase_init;
 uint32_t error = 0u,ret_val = HAL_ERROR;
 
     datahi = (*(volatile uint32_t*)FLASH_LASTPAGE_ADDRESS);
@@ -22,11 +28,6 @@ uint32_t error = 0u,ret_val = HAL_ERROR;
     if (( datahi == 0xdeadbeef ) && ( datalo == 0xbeefdead ))
     {
         HAL_FLASH_Unlock();
-        erase_init.TypeErase = FLASH_TYPEERASE_PAGES;
-        erase_init.Page = FLASH_PAGES_NUMBER-1;
-        erase_init.Banks = FLASH_BANK_1;
-        erase_init.NbPages = 1;
-        /* Do the actual erasing. */
         ret_val = HAL_FLASHEx_Erase(&erase_init, &error);
         HAL_FLASH_Lock();
     }

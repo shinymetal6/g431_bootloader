@@ -1,2 +1,2 @@
-bootloader.c:14:10:check_for_sw_reset	32	static
-bootloader.c:36:6:bootloader	8	static
+bootloader.c:21:10:check_for_sw_reset	16	static
+bootloader.c:37:6:bootloader	8	static
