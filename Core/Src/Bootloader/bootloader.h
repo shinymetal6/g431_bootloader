@@ -8,6 +8,8 @@
 #ifndef SRC_BOOTLOADER_BOOTLOADER_H_
 #define SRC_BOOTLOADER_BOOTLOADER_H_
 
+#define	VERBOSE
+
 extern	void bootloader(void);
 extern	void clear_sw_request(void);
 

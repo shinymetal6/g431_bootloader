@@ -53,9 +53,7 @@ void bootloader(void)
 			flash_jump_to_app();
 	}
 #ifdef VERBOSE
-	uart_transmit_str((uint8_t*)"\n\r================================\n\r");
-	uart_transmit_str((uint8_t*)"UART Bootloader\n\r");
-	uart_transmit_str((uint8_t*)"================================\n\r\n\r");
+	uart_transmit_str((uint8_t*)"\n\rUART Bootloader\n\r");
 #endif
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 

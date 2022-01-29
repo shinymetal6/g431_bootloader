@@ -76,14 +76,14 @@ enum {
 
 static int xymodem_send(int serial_fd, const char *filename, int protocol, int wait)
 {
-        size_t len;
-        int ret, fd;
-        uint8_t answer;
-        struct stat stat;
-        const uint8_t *buf;
-        uint8_t eof = X_EOF;
-        struct xmodem_chunk chunk;
-        int skip_payload = 0;
+size_t len;
+int ret, fd;
+uint8_t answer;
+struct stat stat;
+const uint8_t *buf;
+uint8_t eof = X_EOF;
+struct xmodem_chunk chunk;
+int skip_payload = 0 , retry = 0;
 
         fd = open(filename, O_RDONLY);
         if (fd < 0) {
@@ -150,18 +150,22 @@ static int xymodem_send(int serial_fd, const char *filename, int protocol, int w
                 switch (answer) {
                 case X_NAK:
                         status = 'N';
+                        retry++;
                         break;
                 case X_ACK:
                         status = '.';
                         next = 1;
                         break;
                 default:
+                        retry++;
                         status = '?';
                         break;
                 }
 
                 printf("%c", status);
                 fflush(stdout);
+                if ( retry > 5 )
+                return -1;
 
                 if (next) {
                         chunk.block++;
@@ -188,46 +192,97 @@ static int xymodem_send(int serial_fd, const char *filename, int protocol, int w
 
 static int open_serial(const char *path, int baud)
 {
-        int fd;
-        struct termios tty;
+int fd;
+struct termios tty;
 
-        fd = open(path, O_RDWR | O_SYNC);
-        if (fd < 0) {
-                perror("open");
-                return -errno;
-        }
+    fd = open(path, O_RDWR | O_SYNC);
+    if (fd < 0)
+    {
+            perror("Error opening port");
+            return -errno;
+    }
 
-        memset(&tty, 0, sizeof(tty));
-        if (tcgetattr(fd, &tty) != 0) {
-                perror("tcgetattr");
-                return -errno;
-        }
+    memset(&tty, 0, sizeof(tty));
+    if (tcgetattr(fd, &tty) != 0)
+    {
+            perror("tcgetattr");
+            return -errno;
+    }
 
-        cfsetospeed(&tty, baud);
-        cfsetispeed(&tty, baud);
+    cfsetospeed(&tty, baud);
+    cfsetispeed(&tty, baud);
 
-        tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
-        tty.c_iflag &= ~IGNBRK;                         // disable break processing
-        tty.c_lflag = 0;                                // no signaling chars, no echo,
-                                                        // no canonical processing
-        tty.c_oflag = 0;                                // no remapping, no delays
-        tty.c_cc[VMIN]  = 1;                            // read doesn't block
-        tty.c_cc[VTIME] = 50;                            // 0.5 seconds read timeout
+    tty.c_cflag = (tty.c_cflag & ~CSIZE) | CS8;     // 8-bit chars
+    tty.c_iflag &= ~IGNBRK;                         // disable break processing
+    tty.c_lflag = 0;                                // no signaling chars, no echo,
+                                                    // no canonical processing
+    tty.c_oflag = 0;                                // no remapping, no delays
+    tty.c_cc[VMIN]  = 1;                            // read doesn't block
+    tty.c_cc[VTIME] = 50;                            // 0.5 seconds read timeout
 
-        tty.c_iflag &= ~(IXON | IXOFF | IXANY);         // shut off xon/xoff ctrl
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);         // shut off xon/xoff ctrl
 
-        tty.c_cflag |= (CLOCAL | CREAD);                // ignore modem controls,
-                                                        // enable reading
-        tty.c_cflag &= ~(PARENB | PARODD);              // shut off parity
-        tty.c_cflag &= ~CSTOPB;
-        tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag |= (CLOCAL | CREAD);                // ignore modem controls,
+                                                    // enable reading
+    tty.c_cflag &= ~(PARENB | PARODD);              // shut off parity
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CRTSCTS;
 
-        if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-                perror("tcsetattr");
-                return -errno;
-        }
+    if (tcsetattr(fd, TCSANOW, &tty) != 0)
+    {
+            perror("tcsetattr");
+            return -errno;
+    }
+    return fd;
+}
 
-        return fd;
+int serial_open(char *port, int baud)
+{
+struct termios tty;
+int serial_port;
+
+    serial_port = open(port, O_RDWR);
+
+    // Read in existing settings, and handle any error
+    if(tcgetattr(serial_port, &tty) != 0)
+    {
+        printf("Error %i from tcgetattr: %s on port %s\n", errno, strerror(errno),port);
+        return 1;
+    }
+
+    tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+    tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
+    tty.c_cflag &= ~CSIZE; // Clear all bits that set the data size
+    tty.c_cflag |= CS8; // 8 bits per byte (most common)
+    tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+    tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+
+    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ECHO; // Disable echo
+    tty.c_lflag &= ~ECHOE; // Disable erasure
+    tty.c_lflag &= ~ECHONL; // Disable new-line echo
+    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+
+    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+    // tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT PRESENT ON LINUX)
+    // tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars (0x004) in output (NOT PRESENT ON LINUX)
+
+    tty.c_cc[VTIME] = 30;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VMIN] = 0;
+
+    // Set in/out baud rate to be B115200
+    cfsetispeed(&tty, B115200);
+
+    // Save tty settings, also checking for error
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0)
+    {
+        printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+        return -1;
+    }
+    return serial_port; // success
 }
 
 static void dump_serial(int serial_fd)
@@ -243,33 +298,15 @@ static void dump_serial(int serial_fd)
 
 int main(int argc, char **argv)
 {
-        int a, ret, serial_fd;
+        int ret, serial_fd;
 
-        serial_fd = open_serial("/dev/ttyACM0", 115200);
+        serial_fd = open_serial("/dev/ttyACM0", B115200);
         if (serial_fd < 0)
                 return -errno;
 
         ret = xymodem_send(serial_fd, argv[1], PROTOCOL_XMODEM, 1);
-        if (ret < 0)
-                return ret;
-/*
-        ret = xymodem_send(serial_fd, argv[2], PROTOCOL_YMODEM, 1);
-        if (ret < 0)
-                return ret;
-
-        sleep(4);
-
-        ret = xymodem_send(serial_fd, argv[1], PROTOCOL_YMODEM, 0);
-        if (ret < 0)
-                return ret;
-
-        sleep(3);
-
-        ret = xymodem_send(serial_fd, argv[2], PROTOCOL_YMODEM, 0);
-        if (ret < 0)
-                return ret;
 
         dump_serial(serial_fd);
-*/
-        return 0;
+        close(serial_fd);
+        return ret;
 }

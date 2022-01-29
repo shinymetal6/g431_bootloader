@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="/Devel/Stm32Sw_1.8.1/g431test/Debug/g431test.bin" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -34,6 +35,7 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="xmodem.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
